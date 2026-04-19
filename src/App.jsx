@@ -5,6 +5,7 @@ import CurrencyTicker from './components/CurrencyTicker';
 import Home from './pages/Home';
 import NewsDetail from './pages/NewsDetail';
 import Finance from './pages/Finance';
+import Sports from './pages/Sports';
 import ScrollToTop from './components/ScrollToTop';
 
 const RSS2JSON_API = 'https://api.rss2json.com/v1/api.json?rss_url=';
@@ -89,6 +90,7 @@ function App() {
           <Route path="/" element={<Home news={allNews} loading={loading} error={error} />} />
           <Route path="/haber/:id" element={<NewsDetail news={allNews} loading={loading} />} />
           <Route path="/finans" element={<Finance />} />
+          <Route path="/spor" element={<Sports />} />
         </Routes>
       </main>
 
