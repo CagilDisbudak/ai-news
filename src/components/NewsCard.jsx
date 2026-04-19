@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock } from 'lucide-react';
+import { Clock, Tag } from 'lucide-react';
 import ShareButtons from './ShareButtons';
 
 const stripHtml = (html) => {
@@ -69,28 +69,49 @@ const getSentiment = (title, content) => {
     const text = (title + ' ' + content).toLowerCase();
     const positiveWords = ['rekor', 'yükseldi', 'arttı', 'başarı', 'kazandı', 'zirve', 'büyüme', 'müjde', 'onaylandı', 'şampiyon', 'galibiyet', 'keşfedildi'];
     const negativeWords = ['düştü', 'kayıp', 'kaza', 'savaş', 'ölüm', 'yaralı', 'yangın', 'düşüş', 'kriz', 'tehlike', 'hata', 'yasak', 'iflas', 'saldırı'];
-    
     let score = 0;
     positiveWords.forEach(w => { if (text.includes(w)) score++; });
     negativeWords.forEach(w => { if (text.includes(w)) score--; });
-    
     if (score > 0) return { label: 'POZİTİF', color: 'text-green-600 border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800' };
     if (score < 0) return { label: 'NEGATİF', color: 'text-red-600 border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800' };
     return { label: 'NÖTR', color: 'text-gray-500 border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700' };
 };
 
+const extractSmartTags = (title, content) => {
+    const text = (title + ' ' + content).toLowerCase();
+    const entities = ['Apple', 'Nvidia', 'Tesla', 'Bitcoin', 'Ethereum', 'NASA', 'SpaceX', 'Dolar', 'Euro', 'TCMB', 'Fed', 'Altın', 'Borsa', 'Google', 'Microsoft', 'Samsung', 'Fenerbahçe', 'Galatasaray', 'Beşiktaş', 'Arda Güler', 'Elon Musk', 'Yapay Zeka', 'ChatGPT', 'TOGG'];
+    return entities.filter(e => text.includes(e.toLowerCase())).slice(0, 3);
+};
+
+const cleanTitle = (title) => {
+    let cleaned = title;
+    const clickbaitPhrases = ['İnanamayacaksınız', 'Şok Şok', 'Belli Oldu', 'Olay Gelişme', 'Dikkat', 'Flaş Flaş', 'Az Önce Açıklandı', 'Resmen Duyuruldu', 'Büyük Sürpriz', 'Gündeme Bomba Gibi Düştü', 'Tüm Detaylar'];
+    clickbaitPhrases.forEach(p => {
+        const regex = new RegExp(p, 'gi');
+        cleaned = cleaned.replace(regex, '').replace(/!+/g, '.');
+    });
+    return cleaned.trim().charAt(0).toUpperCase() + cleaned.trim().slice(1);
+};
+
 const NewsCard = ({ item }) => {
+    const [isShieldActive, setIsShieldActive] = useState(localStorage.getItem('clickbait-shield') === 'active');
+    
+    useEffect(() => {
+        const handleShieldToggle = (e) => setIsShieldActive(e.detail);
+        window.addEventListener('clickbait-shield-toggle', handleShieldToggle);
+        return () => window.removeEventListener('clickbait-shield-toggle', handleShieldToggle);
+    }, []);
+
     const categoryLabel = item.category ? item.category.toUpperCase() : 'GENEL';
     const dateStr = formatDate(item.pubDate);
     const imageUrl = extractImage(item);
-    
     const cleanDescription = stripHtml(item.description);
     const summary = cleanDescription.length > 150 ? cleanDescription.substring(0, 150) + '...' : cleanDescription;
-
     const fullText = stripHtml(item.content || item.description || '');
     const readingTime = calcReadingTime(fullText);
     const sentiment = getSentiment(item.title, fullText);
-
+    const tags = extractSmartTags(item.title, fullText);
+    const displayTitle = isShieldActive ? cleanTitle(item.title) : item.title;
     const shareUrl = item.link || window.location.href;
 
     return (
@@ -112,8 +133,18 @@ const NewsCard = ({ item }) => {
                 </div>
 
                 <h2 className="text-xl md:text-2xl font-serif font-bold text-black dark:text-white mb-2 leading-tight group-hover:underline decoration-2 underline-offset-4">
-                    {item.title}
+                    {displayTitle}
                 </h2>
+
+                {tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {tags.map(tag => (
+                            <span key={tag} className="flex items-center gap-1 text-[10px] font-mono font-bold uppercase tracking-widest text-brand-600 bg-brand-50 dark:bg-brand-900/20 dark:text-brand-400 px-2 py-0.5 rounded-full">
+                                <Tag size={8} /> {tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
 
                 <p className="text-sm font-editorial text-gray-700 dark:text-gray-300 mb-5 line-clamp-3 leading-relaxed flex-grow">
                     {summary}
@@ -134,7 +165,7 @@ const NewsCard = ({ item }) => {
             </Link>
 
             <div className="mt-4">
-                <ShareButtons title={item.title} url={shareUrl} />
+                <ShareButtons title={displayTitle} url={shareUrl} />
             </div>
         </article>
     );

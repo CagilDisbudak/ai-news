@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, Menu, X } from 'lucide-react';
+import { Moon, Sun, Menu, X, Shield, ShieldAlert } from 'lucide-react';
 import WeatherWidget from './WeatherWidget';
 
 const CATEGORIES = [
@@ -20,6 +20,8 @@ const Navbar = () => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
+  const [isClickbaitShieldActive, setIsClickbaitShieldActive] = useState(localStorage.getItem('clickbait-shield') === 'active');
+
   const toggleTheme = () => {
     document.documentElement.classList.toggle('dark');
     if (document.documentElement.classList.contains('dark')) {
@@ -27,6 +29,13 @@ const Navbar = () => {
     } else {
       localStorage.setItem('theme', 'light');
     }
+  };
+
+  const toggleClickbaitShield = () => {
+    const newState = !isClickbaitShieldActive;
+    setIsClickbaitShieldActive(newState);
+    localStorage.setItem('clickbait-shield', newState ? 'active' : 'inactive');
+    window.dispatchEvent(new CustomEvent('clickbait-shield-toggle', { detail: newState }));
   };
 
   const handleFilterClick = (category) => {
@@ -64,6 +73,10 @@ const Navbar = () => {
                     <Link to="/finans" className="text-xs font-bold uppercase tracking-widest text-black dark:text-white hover:opacity-70 flex items-center gap-1 border-2 border-black dark:border-white px-2 py-1 transition-colors">
                         Finans
                     </Link>
+
+                    <button onClick={toggleClickbaitShield} className={`p-2 transition-colors ${isClickbaitShieldActive ? 'text-brand-500' : 'text-gray-400'}`} title="Clickbait Shield (AI Başlık Düzeltici)">
+                        {isClickbaitShieldActive ? <Shield size={20} /> : <ShieldAlert size={20} />}
+                    </button>
 
                     <button onClick={toggleTheme} className="p-2 text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors" aria-label="Toggle Dark Mode">
                         <Moon size={20} className="dark:hidden" />

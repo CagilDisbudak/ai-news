@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Languages, Sparkles } from 'lucide-react';
+import { ArrowLeft, Clock, Languages, Sparkles, Tag } from 'lucide-react';
 import ShareButtons from '../components/ShareButtons';
 
 const SMART_THUMBNAILS = {
@@ -58,14 +58,28 @@ const getSentiment = (title, content) => {
     const text = (title + ' ' + content).toLowerCase();
     const positiveWords = ['rekor', 'yükseldi', 'arttı', 'başarı', 'kazandı', 'zirve', 'büyüme', 'müjde', 'onaylandı', 'şampiyon', 'galibiyet', 'keşfedildi'];
     const negativeWords = ['düştü', 'kayıp', 'kaza', 'savaş', 'ölüm', 'yaralı', 'yangın', 'düşüş', 'kriz', 'tehlike', 'hata', 'yasak', 'iflas', 'saldırı'];
-    
     let score = 0;
     positiveWords.forEach(w => { if (text.includes(w)) score++; });
     negativeWords.forEach(w => { if (text.includes(w)) score--; });
-    
     if (score > 0) return { label: 'POZİTİF HABER', color: 'text-green-600 border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800' };
     if (score < 0) return { label: 'NEGATİF HABER', color: 'text-red-600 border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800' };
     return { label: 'NÖTR HABER', color: 'text-gray-500 border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700' };
+};
+
+const extractSmartTags = (title, content) => {
+    const text = (title + ' ' + content).toLowerCase();
+    const entities = ['Apple', 'Nvidia', 'Tesla', 'Bitcoin', 'Ethereum', 'NASA', 'SpaceX', 'Dolar', 'Euro', 'TCMB', 'Fed', 'Altın', 'Borsa', 'Google', 'Microsoft', 'Samsung', 'Fenerbahçe', 'Galatasaray', 'Beşiktaş', 'Arda Güler', 'Elon Musk', 'Yapay Zeka', 'ChatGPT', 'TOGG'];
+    return entities.filter(e => text.includes(e.toLowerCase())).slice(0, 3);
+};
+
+const cleanTitle = (title) => {
+    let cleaned = title;
+    const clickbaitPhrases = ['İnanamayacaksınız', 'Şok Şok', 'Belli Oldu', 'Olay Gelişme', 'Dikkat', 'Flaş Flaş', 'Az Önce Açıklandı', 'Resmen Duyuruldu', 'Büyük Sürpriz', 'Gündeme Bomba Gibi Düştü', 'Tüm Detaylar'];
+    clickbaitPhrases.forEach(p => {
+        const regex = new RegExp(p, 'gi');
+        cleaned = cleaned.replace(regex, '').replace(/!+/g, '.');
+    });
+    return cleaned.trim().charAt(0).toUpperCase() + cleaned.trim().slice(1);
 };
 
 const NewsDetail = ({ news, loading }) => {
@@ -74,6 +88,13 @@ const NewsDetail = ({ news, loading }) => {
     const [translatedTitle, setTranslatedTitle] = useState(null);
     const [translatedContent, setTranslatedContent] = useState(null);
     const [isTranslating, setIsTranslating] = useState(false);
+    const [isShieldActive, setIsShieldActive] = useState(localStorage.getItem('clickbait-shield') === 'active');
+
+    useEffect(() => {
+        const handleShieldToggle = (e) => setIsShieldActive(e.detail);
+        window.addEventListener('clickbait-shield-toggle', handleShieldToggle);
+        return () => window.removeEventListener('clickbait-shield-toggle', handleShieldToggle);
+    }, []);
 
     const newsItem = news.find(item => item.id === id);
 
@@ -106,6 +127,8 @@ const NewsDetail = ({ news, loading }) => {
     const fullText = stripHtml(rawContent);
     const readingTime = calcReadingTime(fullText);
     const sentiment = getSentiment(newsItem.title, fullText);
+    const tags = extractSmartTags(newsItem.title, fullText);
+    const displayTitle = isShieldActive ? cleanTitle(newsItem.title) : (translatedTitle || newsItem.title);
     const shareUrl = newsItem.link || window.location.href;
 
     const isShortContent = fullText.length < 300;
@@ -182,8 +205,18 @@ const NewsDetail = ({ news, loading }) => {
                 </div>
                 
                 <h1 className="text-3xl md:text-5xl font-serif font-black text-black dark:text-white leading-tight mb-6">
-                    {translatedTitle || newsItem.title}
+                    {displayTitle}
                 </h1>
+
+                {tags.length > 0 && (
+                    <div className="flex flex-wrap justify-center gap-2 mb-6">
+                        {tags.map(tag => (
+                            <span key={tag} className="flex items-center gap-1 text-[10px] font-mono font-bold uppercase tracking-widest text-brand-600 bg-brand-50 dark:bg-brand-900/20 dark:text-brand-400 px-3 py-1 rounded-full">
+                                <Tag size={8} /> {tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
 
                 <div className="flex items-center justify-center gap-4 text-sm font-editorial italic text-gray-600 dark:text-gray-400 flex-wrap">
                     <time>{dateStr}</time>
@@ -242,7 +275,7 @@ const NewsDetail = ({ news, loading }) => {
             )}
 
             <div className="mt-16 pt-8 border-t-2 border-black dark:border-white flex flex-col sm:flex-row items-center justify-between gap-6">
-                <ShareButtons title={translatedTitle || newsItem.title} url={shareUrl} />
+                <ShareButtons title={displayTitle} url={shareUrl} />
                 {!isShortContent && (
                     <a href={newsItem.link} target="_blank" rel="noopener noreferrer" 
                        className="inline-block px-8 py-3 bg-black text-white dark:bg-white dark:text-black font-bold uppercase tracking-widest text-sm hover:opacity-80 transition-opacity">
