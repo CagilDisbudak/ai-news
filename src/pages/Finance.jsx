@@ -184,7 +184,7 @@ const Finance = () => {
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-gray-200 font-sans pb-20">
             {/* Header */}
-            <header className="border-b border-gray-800 bg-black sticky top-0 z-10">
+            <header className="border-b border-gray-800 bg-black">
                 <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-white transition-colors">
