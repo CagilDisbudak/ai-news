@@ -1,35 +1,73 @@
-# AI News Portal 🚀
+# 🗞️ The AI News - Modern Editoryal Haber Portalı
 
-AI News Portal, en güncel teknoloji, ekonomi ve dünya haberlerini tek bir noktada toplayan, tamamen frontend tabanlı (veritabanı veya backend sunucusu gerektirmeyen) modern bir haber okuma platformudur. 
+![AI News Header](https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=1200)
 
-Uygulama, haberleri çekerken yapay zeka tarafından özetlenmiş hissiyatı veren özel bir UI tasarımıyla ve "Glassmorphism" (cam efekti) konseptiyle geliştirilmiştir.
+**The AI News**, "The Times" estetiğini modern teknolojiyle birleştiren, yapay zeka destekli ve gerçek zamanlı veri akışına sahip yeni nesil bir haber portalıdır. 
 
-## ✨ Özellikler
+Sadece bir haber sitesi değil, aynı zamanda kapsamlı bir **Finans Merkezi** ve **Yapay Zeka Asistanı** içeren dijital bir ekosistemdir.
 
-- **Çoklu Veri Kaynağı:** Teknoloji (Webrazzi), Ekonomi (Bloomberg HT) ve Dünya (Euronews) haberlerini eşzamanlı olarak çeker.
-- **Backend Gerektirmez:** Haberler `rss2json` API kullanılarak asenkron olarak doğrudan tarayıcı üzerinden getirilir.
-- **Modern Arayüz:** Tailwind CSS kullanılarak geliştirilmiş, tamamen responsive (mobil ve tablet uyumlu) tasarım.
-- **Karanlık Tema (Dark Mode):** Göz yormayan ve sistem tercihinizi/seçiminizi hatırlayan şık bir karanlık tema desteği.
-- **AI Summary Konsepti:** Her habere özel, dikkat çekici ve estetik bir "✨ AI Özet" rozeti.
-- **Kategori Filtreleme:** Haberler arasında hızlı geçiş yapabilmeniz için kategorilere özel filtreleme sistemi.
+---
 
-## 🛠 Kullanılan Teknolojiler
+## 🌟 Öne Çıkan Özellikler
 
-- **HTML5 & Vanilla JavaScript** (Esnek ve hızlı)
-- **Tailwind CSS (CDN)** (Hızlı stillendirme ve modern tasarımlar için)
-- **rss2json API** (XML/RSS beslemelerini JSON formatına çevirmek için)
-- **FontAwesome & Google Fonts** (Tipografi ve ikonlar için)
+### 🗞️ Akıllı Haber Deneyimi
+- **Çoklu Kaynak Entegrasyonu:** Webrazzi, Bloomberg HT, BBC Türkçe, Ajansspor, ASpor, NTV Spor, NASA ve UzmanCoin gibi devlerden anlık veri çekimi.
+- **AI Çeviri Modülü:** Yabancı kaynaklı (NASA vb.) haberleri tek tıkla Türkçeye çeviren MyMemory API entegreli yapay zeka sistemi.
+- **Editoryal Tasarım:** Playfair Display ve Lora fontlarıyla zenginleştirilmiş, klasik gazete prestijine sahip modern UI.
+- **Sonsuz Kaydırma (Infinite Scroll):** Sayfa sonuna gelindiğinde otomatik yüklenen kesintisiz haber akışı.
+- **Akıllı Arama:** Başlıklar arasında anlık, performanslı client-side filtreleme.
 
-## 🚀 Nasıl Çalıştırılır?
+### 📈 Profesyonel Finans Merkezi
+- **Canlı Dashboard:** USD, EUR, Altın, Gümüş ve Bitcoin kurlarını saniyelik takip edin.
+- **İnteraktif Grafikler:** Recharts tabanlı, zaman aralığı seçilebilen ve geçmiş veri simülasyonu yapan gelişmiş grafik arayüzü.
+- **AI Tahmin Analizi:** Grafik trendlerini inceleyerek gelecek 7 gün için eğilim analizi yapan akıllı algoritma.
+- **Kapsamlı Dönüştürücü:** Tüm para birimleri, değerli metaller ve kripto varlıklar arasında anlık çapraz çevrim.
 
-Bu projenin çalışması için bilgisayarınızda herhangi bir ek yazılıma (Node.js, npm, veritabanı vb.) ihtiyacınız yoktur.
+### 🛠️ Teknik Detaylar
+- **Framework:** React + Vite
+- **Styling:** Tailwind CSS (Custom Typography & Dark Mode)
+- **State Management:** React Hooks & Context API
+- **Charts:** Recharts
+- **Icons:** Lucide-react
+- **APIs:** rss2json, ExchangeRate-API, CoinGecko, MyMemory Translation, OpenWeatherMap
 
-1. Proje dosyalarını bilgisayarınıza indirin veya klonlayın.
-2. Klasör içerisindeki `index.html` dosyasına çift tıklayarak varsayılan tarayıcınızda açın.
-3. Uygulama otomatik olarak internete bağlanıp güncel haberleri çekecektir.
+---
 
-## 📁 Dosya Yapısı
+## 🚀 Hızlı Başlangıç
 
-- `index.html`: Uygulamanın iskeleti, Tailwind kütüphanesi ve UI yapısı.
-- `app.js`: Veri çekme (fetch), hata yönetimi, filtreleme ve karanlık tema işlevlerini barındıran asıl uygulama mantığı.
-- `styles.css`: Tailwind'in CDN versiyonuyla kolayca yapılamayan özel animasyonlar, hover efektleri ve cam (glassmorphism) tasarımlarını içeren dosya.
+Projeyi lokalinizde çalıştırmak için şu adımları izleyin:
+
+1. **Depoyu Klonlayın:**
+   ```bash
+   git clone https://github.com/kullaniciadi/ai-news-portal.git
+   ```
+
+2. **Bağımlılıkları Kurun:**
+   ```bash
+   npm install
+   ```
+
+3. **Geliştirme Sunucusunu Başlatın:**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 🎨 Tasarım Felsefesi
+
+Proje, **"Bilgi Prestijdir"** mottosuyla geliştirilmiştir. Siyah-beyazın asaletini, modern kart tasarımları ve mikro-animasyonlarla birleştirerek kullanıcıyı yormayan, okuma odaklı bir deneyim sunar. 
+
+- **Dark Mode:** Göz yormayan, tamamen optimize edilmiş karanlık tema.
+- **Responsive:** Mobilden masaüstüne her cihazda mükemmel okuma deneyimi.
+- **Typography:** Serif ve Sans-serif dengesiyle oluşturulmuş hiyerarşik yapı.
+
+---
+
+## ⚖️ Yasal Uyarı
+
+Bu projedeki Finans Merkezi bölümünde sunulan tüm analizler ve "AI Tahminleri" tamamen simülasyon amaçlıdır. **Kesinlikle yatırım tavsiyesi değildir.** Haber içerikleri ilgili RSS kaynaklarının sorumluluğundadır.
+
+---
+
+*Geleceğin haber portalını bugün deneyimleyin.* 📰✨
