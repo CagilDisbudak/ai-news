@@ -26,19 +26,17 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Init Theme
-  useEffect(() => {
-    if (localStorage.getItem('theme') === 'dark' || 
-        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
-  }, []);
+    useEffect(() => {
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, []);
 
-  // Fetch Live RSS Data
-  useEffect(() => {
-    const fetchNews = async () => {
+    useEffect(() => {
+      const fetchNews = async () => {
       setLoading(true);
       try {
         const fetchPromises = FEEDS.map(feed => 

@@ -54,6 +54,20 @@ const calcReadingTime = (text) => {
     return minutes < 1 ? 1 : minutes;
 };
 
+const getSentiment = (title, content) => {
+    const text = (title + ' ' + content).toLowerCase();
+    const positiveWords = ['rekor', 'yükseldi', 'arttı', 'başarı', 'kazandı', 'zirve', 'büyüme', 'müjde', 'onaylandı', 'şampiyon', 'galibiyet', 'keşfedildi'];
+    const negativeWords = ['düştü', 'kayıp', 'kaza', 'savaş', 'ölüm', 'yaralı', 'yangın', 'düşüş', 'kriz', 'tehlike', 'hata', 'yasak', 'iflas', 'saldırı'];
+    
+    let score = 0;
+    positiveWords.forEach(w => { if (text.includes(w)) score++; });
+    negativeWords.forEach(w => { if (text.includes(w)) score--; });
+    
+    if (score > 0) return { label: 'POZİTİF HABER', color: 'text-green-600 border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800' };
+    if (score < 0) return { label: 'NEGATİF HABER', color: 'text-red-600 border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800' };
+    return { label: 'NÖTR HABER', color: 'text-gray-500 border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700' };
+};
+
 const NewsDetail = ({ news, loading }) => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -91,6 +105,7 @@ const NewsDetail = ({ news, loading }) => {
 
     const fullText = stripHtml(rawContent);
     const readingTime = calcReadingTime(fullText);
+    const sentiment = getSentiment(newsItem.title, fullText);
     const shareUrl = newsItem.link || window.location.href;
 
     const isShortContent = fullText.length < 300;
@@ -98,14 +113,12 @@ const NewsDetail = ({ news, loading }) => {
     const handleTranslate = async () => {
         setIsTranslating(true);
         try {
-            // Translate Title
             const titleRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(newsItem.title)}&langpair=en|tr`);
             const titleData = await titleRes.json();
             if(titleData.responseData.translatedText) {
                 setTranslatedTitle(titleData.responseData.translatedText);
             }
 
-            // Translate Content (first 500 chars limit safely for free API)
             const textToTranslate = fullText.substring(0, 499);
             const contentRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(textToTranslate)}&langpair=en|tr`);
             const contentData = await contentRes.json();
@@ -133,7 +146,6 @@ const NewsDetail = ({ news, loading }) => {
                     Geri
                 </button>
 
-                {/* Translation Buttons */}
                 {!translatedContent ? (
                     <button 
                         onClick={handleTranslate}
@@ -156,9 +168,11 @@ const NewsDetail = ({ news, loading }) => {
                 )}
             </div>
 
-            {/* Editorial Header */}
             <header className="mb-10 text-center border-b-2 border-black dark:border-white pb-8">
-                <div className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-6 flex flex-col items-center justify-center gap-2">
+                <div className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-6 flex flex-col items-center justify-center gap-3">
+                    <span className={`text-[10px] font-bold px-3 py-1 border ${sentiment.color}`}>
+                        {sentiment.label}
+                    </span>
                     <span>KAYNAK: <span className="text-black dark:text-white">{newsItem.sourceName}</span></span>
                     {translatedTitle && (
                         <span className="flex items-center gap-1 text-[10px] bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 px-2 py-1 rounded-sm border border-yellow-200 dark:border-yellow-800">
@@ -182,7 +196,6 @@ const NewsDetail = ({ news, loading }) => {
                 </div>
             </header>
 
-            {/* Featured Image */}
             <figure className="mb-12">
                 <img 
                     src={imageUrl} 
@@ -195,7 +208,6 @@ const NewsDetail = ({ news, loading }) => {
                 </figcaption>
             </figure>
 
-            {/* Content Body */}
             <div className="drop-cap">
                 {translatedContent ? (
                     <div className="prose prose-lg dark:prose-invert max-w-none font-editorial text-gray-800 dark:text-gray-200 leading-loose">
@@ -216,7 +228,6 @@ const NewsDetail = ({ news, loading }) => {
                 )}
             </div>
 
-            {/* Short Content Warning */}
             {isShortContent && (
                 <div className="mt-12 p-6 bg-gray-50 border border-gray-200 dark:bg-gray-900 dark:border-gray-800 text-center">
                     <h3 className="text-lg font-serif font-bold text-black dark:text-white mb-2 uppercase">Haberin Devamı</h3>
@@ -230,7 +241,6 @@ const NewsDetail = ({ news, loading }) => {
                 </div>
             )}
 
-            {/* Share & Original Link */}
             <div className="mt-16 pt-8 border-t-2 border-black dark:border-white flex flex-col sm:flex-row items-center justify-between gap-6">
                 <ShareButtons title={translatedTitle || newsItem.title} url={shareUrl} />
                 {!isShortContent && (

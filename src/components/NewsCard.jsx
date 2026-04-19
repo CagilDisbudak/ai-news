@@ -65,6 +65,20 @@ const calcReadingTime = (text) => {
     return minutes < 1 ? 1 : minutes;
 };
 
+const getSentiment = (title, content) => {
+    const text = (title + ' ' + content).toLowerCase();
+    const positiveWords = ['rekor', 'yükseldi', 'arttı', 'başarı', 'kazandı', 'zirve', 'büyüme', 'müjde', 'onaylandı', 'şampiyon', 'galibiyet', 'keşfedildi'];
+    const negativeWords = ['düştü', 'kayıp', 'kaza', 'savaş', 'ölüm', 'yaralı', 'yangın', 'düşüş', 'kriz', 'tehlike', 'hata', 'yasak', 'iflas', 'saldırı'];
+    
+    let score = 0;
+    positiveWords.forEach(w => { if (text.includes(w)) score++; });
+    negativeWords.forEach(w => { if (text.includes(w)) score--; });
+    
+    if (score > 0) return { label: 'POZİTİF', color: 'text-green-600 border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800' };
+    if (score < 0) return { label: 'NEGATİF', color: 'text-red-600 border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800' };
+    return { label: 'NÖTR', color: 'text-gray-500 border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700' };
+};
+
 const NewsCard = ({ item }) => {
     const categoryLabel = item.category ? item.category.toUpperCase() : 'GENEL';
     const dateStr = formatDate(item.pubDate);
@@ -75,35 +89,36 @@ const NewsCard = ({ item }) => {
 
     const fullText = stripHtml(item.content || item.description || '');
     const readingTime = calcReadingTime(fullText);
+    const sentiment = getSentiment(item.title, fullText);
 
     const shareUrl = item.link || window.location.href;
 
     return (
         <article className="news-card flex flex-col h-full group">
             <Link to={`/haber/${item.id}`} className="block flex-grow flex flex-col">
-                {/* Source & Date Header */}
                 <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-black dark:text-white border-b border-black dark:border-white pb-2 mb-4">
                     <span>KAYNAK: {item.sourceName?.toUpperCase()}</span>
                     <span className="text-gray-500 font-medium normal-case tracking-normal">{dateStr}</span>
                 </div>
 
-                {/* Title */}
+                <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 border ${sentiment.color}`}>
+                        {sentiment.label}
+                    </span>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 font-mono">
+                        <Clock size={12} />
+                        <span>{readingTime} dk okuma</span>
+                    </div>
+                </div>
+
                 <h2 className="text-xl md:text-2xl font-serif font-bold text-black dark:text-white mb-2 leading-tight group-hover:underline decoration-2 underline-offset-4">
                     {item.title}
                 </h2>
 
-                {/* Reading Time */}
-                <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mb-4 font-mono">
-                    <Clock size={12} />
-                    <span>{readingTime} dk okuma</span>
-                </div>
-
-                {/* Summary */}
                 <p className="text-sm font-editorial text-gray-700 dark:text-gray-300 mb-5 line-clamp-3 leading-relaxed flex-grow">
                     {summary}
                 </p>
 
-                {/* Image */}
                 <div className="relative w-full h-48 md:h-56 mt-auto overflow-hidden bg-gray-100 dark:bg-gray-800">
                     <img 
                         src={imageUrl} 
@@ -112,14 +127,12 @@ const NewsCard = ({ item }) => {
                         loading="lazy" 
                         onError={(e) => { e.target.src = SMART_THUMBNAILS[item.category] || SMART_THUMBNAILS['dünya']; }}
                     />
-                    {/* Category Label overlay */}
                     <div className="absolute bottom-0 left-0 bg-black text-white dark:bg-white dark:text-black px-3 py-1 text-xs font-bold uppercase tracking-widest">
                         {categoryLabel}
                     </div>
                 </div>
             </Link>
 
-            {/* Share Buttons - Outside the Link */}
             <div className="mt-4">
                 <ShareButtons title={item.title} url={shareUrl} />
             </div>

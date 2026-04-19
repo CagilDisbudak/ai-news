@@ -8,25 +8,21 @@ const Home = ({ news, loading, error }) => {
     const [currentCategory, setCurrentCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-    const observerRef = useRef(null);
     const loadMoreRef = useRef(null);
     
-    // Listen for category filter events from Navbar
     useEffect(() => {
         const handleFilter = (e) => {
             setCurrentCategory(e.detail);
-            setVisibleCount(ITEMS_PER_PAGE); // Reset on category change
+            setVisibleCount(ITEMS_PER_PAGE);
         };
         window.addEventListener('filter-category', handleFilter);
         return () => window.removeEventListener('filter-category', handleFilter);
     }, []);
 
-    // Reset visible count when search changes
     useEffect(() => {
         setVisibleCount(ITEMS_PER_PAGE);
     }, [searchQuery]);
 
-    // Filter by category
     let filteredNews = currentCategory === 'all' 
         ? news 
         : news.filter(item => item.category === currentCategory);
