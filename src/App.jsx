@@ -5,6 +5,7 @@ import CurrencyTicker from './components/CurrencyTicker';
 import Home from './pages/Home';
 import NewsDetail from './pages/NewsDetail';
 import Finance from './pages/Finance';
+import ScrollToTop from './components/ScrollToTop';
 
 const RSS2JSON_API = 'https://api.rss2json.com/v1/api.json?rss_url=';
 const FEEDS = [
@@ -82,6 +83,7 @@ function App() {
 
   return (
     <>
+      <ScrollToTop />
       <CurrencyTicker />
       <Navbar />
       <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
