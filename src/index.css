@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  /* Filter Buttons Editorial Style */
+  .filter-btn {
+    @apply px-4 py-2 text-sm font-semibold uppercase tracking-wider transition-all text-gray-500 bg-transparent border-b-2 border-transparent;
+  }
+  .dark .filter-btn {
+    @apply text-gray-400;
+  }
+  .filter-btn:hover {
+    @apply text-black border-black;
+  }
+  .dark .filter-btn:hover {
+    @apply text-white border-white;
+  }
+  .filter-btn.active {
+    @apply text-black border-black;
+  }
+  .dark .filter-btn.active {
+    @apply text-white border-white;
+  }
+
+  /* Filter Buttons Mobile */
+  .filter-btn-mobile {
+    @apply block px-3 py-3 text-base font-semibold uppercase tracking-wider text-left transition-all text-gray-600 bg-transparent w-full border-b border-gray-100;
+  }
+  .dark .filter-btn-mobile {
+    @apply text-gray-400 border-gray-800;
+  }
+  .filter-btn-mobile:hover, .filter-btn-mobile.active {
+    @apply text-black bg-gray-50;
+  }
+  .dark .filter-btn-mobile:hover, .dark .filter-btn-mobile.active {
+    @apply text-white bg-gray-900;
+  }
+
+  /* Editorial Card Styling */
+  .news-card {
+    @apply transition-all duration-300 border-b border-gray-300 dark:border-dark-border pb-6;
+  }
+  .news-card:hover {
+    @apply opacity-80;
+  }
+
+  /* Minimal Badge */
+  .ai-badge {
+    @apply bg-black text-white px-2 py-1 text-xs font-bold uppercase tracking-widest border border-black dark:bg-white dark:text-black dark:border-white;
+  }
+
+  /* Editorial Drop Cap for Content */
+  .drop-cap > p:first-child::first-letter {
+    float: left;
+    font-size: 4.5rem;
+    line-height: 0.8;
+    padding-top: 4px;
+    padding-right: 8px;
+    padding-left: 3px;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: #000;
+  }
+  .dark .drop-cap > p:first-child::first-letter {
+    color: #fff;
+  }
+
+}
