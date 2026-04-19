@@ -2,6 +2,11 @@
 
 ![AI News Header](https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=1200)
 
+## 🌐 Canlı Demo
+**Uygulamayı buradan inceleyebilirsiniz:** [https://cagildisbudak.github.io/ai-news/](https://cagildisbudak.github.io/ai-news/)
+
+---
+
 **The AI News**, "The Times" estetiğini modern teknolojiyle birleştiren, yapay zeka destekli ve gerçek zamanlı veri akışına sahip yeni nesil bir haber portalıdır. 
 
 Sadece bir haber sitesi değil, aynı zamanda kapsamlı bir **Finans Merkezi** ve **Yapay Zeka Asistanı** içeren dijital bir ekosistemdir.
