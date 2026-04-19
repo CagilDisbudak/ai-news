@@ -8,6 +8,7 @@ const Home = ({ news, loading, error }) => {
     const [currentCategory, setCurrentCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+    const observerRef = useRef(null);
     const loadMoreRef = useRef(null);
     
     useEffect(() => {
