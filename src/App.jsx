@@ -1,14 +1,23 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import CurrencyTicker from './components/CurrencyTicker';
 import Home from './pages/Home';
 import NewsDetail from './pages/NewsDetail';
+import Finance from './pages/Finance';
 
 const RSS2JSON_API = 'https://api.rss2json.com/v1/api.json?rss_url=';
 const FEEDS = [
     { url: 'https://webrazzi.com/feed', category: 'teknoloji', sourceName: 'Webrazzi' },
     { url: 'https://www.bloomberght.com/rss', category: 'ekonomi', sourceName: 'Bloomberg HT' },
-    { url: 'https://tr.euronews.com/rss?level=vertical&type=all', category: 'dünya', sourceName: 'Euronews' }
+    { url: 'https://www.bbc.co.uk/turkce/index.xml', category: 'dünya', sourceName: 'BBC Türkçe' },
+    { url: 'https://ajansspor.com/rss', category: 'spor', sourceName: 'Ajansspor' },
+    { url: 'https://www.aspor.com.tr/rss/anasayfa.xml', category: 'spor', sourceName: 'ASpor' },
+    { url: 'https://www.ntv.com.tr/spor.rss', category: 'spor', sourceName: 'NTV Spor' },
+    { url: 'https://beinsports.com.tr/rss', category: 'spor', sourceName: 'BeIn Sports' },
+    { url: 'https://www.nasa.gov/rss/dyn/breaking_news.rss', category: 'bilim', sourceName: 'NASA' },
+    { url: 'https://www.donanimhaber.com/rss/tum/', category: 'donanım', sourceName: 'Donanım Haber' },
+    { url: 'https://uzmancoin.com/feed/', category: 'kripto', sourceName: 'UzmanCoin' }
 ];
 
 function App() {
@@ -38,7 +47,7 @@ function App() {
                     if (data.status === 'ok') {
                         return data.items.map((item, index) => ({
                             ...item,
-                            id: `${feed.category}-${index}-${Date.now()}`, // Create unique ID for routing
+                            id: `${feed.category}-${index}`,
                             category: feed.category,
                             sourceName: feed.sourceName
                         }));
@@ -73,17 +82,19 @@ function App() {
 
   return (
     <>
+      <CurrencyTicker />
       <Navbar />
-      <main className="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Routes>
           <Route path="/" element={<Home news={allNews} loading={loading} error={error} />} />
           <Route path="/haber/:id" element={<NewsDetail news={allNews} loading={loading} />} />
+          <Route path="/finans" element={<Finance />} />
         </Routes>
       </main>
 
       {/* Footer */}
       <footer className="bg-white dark:bg-dark-bg border-t border-gray-300 dark:border-dark-border mt-auto py-12">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center font-serif">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center font-serif">
               <p className="text-gray-500 dark:text-gray-400 text-sm flex flex-col items-center justify-center gap-2">
                   <span className="font-bold text-lg text-black dark:text-white">THE AI NEWS</span>
                   <span>&copy; {new Date().getFullYear()} Tüm hakları saklıdır.</span>

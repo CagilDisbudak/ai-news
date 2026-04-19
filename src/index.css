@@ -11,7 +11,7 @@
 @layer components {
   /* Filter Buttons Editorial Style */
   .filter-btn {
-    @apply px-4 py-2 text-sm font-semibold uppercase tracking-wider transition-all text-gray-500 bg-transparent border-b-2 border-transparent;
+    @apply px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-all text-gray-500 bg-transparent border-b-2 border-transparent;
   }
   .dark .filter-btn {
     @apply text-gray-400;
@@ -57,7 +57,7 @@
   }
 
   /* Editorial Drop Cap for Content */
-  .drop-cap > p:first-child::first-letter {
+  .drop-cap > div > p:first-child::first-letter {
     float: left;
     font-size: 4.5rem;
     line-height: 0.8;
@@ -68,8 +68,37 @@
     font-weight: 700;
     color: #000;
   }
-  .dark .drop-cap > p:first-child::first-letter {
+  .dark .drop-cap > div > p:first-child::first-letter {
     color: #fff;
   }
+}
 
+/* Ticker Animation */
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+
+.animate-ticker {
+  animation: ticker-scroll 30s linear infinite;
+}
+
+.ticker-wrap {
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

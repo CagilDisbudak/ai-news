@@ -1,20 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import NewsCard from '../components/NewsCard';
+import SearchBar from '../components/SearchBar';
+
+const ITEMS_PER_PAGE = 12;
 
 const Home = ({ news, loading, error }) => {
     const [currentCategory, setCurrentCategory] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+    const observerRef = useRef(null);
+    const loadMoreRef = useRef(null);
     
+    // Listen for category filter events from Navbar
     useEffect(() => {
         const handleFilter = (e) => {
             setCurrentCategory(e.detail);
+            setVisibleCount(ITEMS_PER_PAGE); // Reset on category change
         };
         window.addEventListener('filter-category', handleFilter);
         return () => window.removeEventListener('filter-category', handleFilter);
     }, []);
 
-    const filteredNews = currentCategory === 'all' 
+    // Reset visible count when search changes
+    useEffect(() => {
+        setVisibleCount(ITEMS_PER_PAGE);
+    }, [searchQuery]);
+
+    // Filter by category
+    let filteredNews = currentCategory === 'all' 
         ? news 
         : news.filter(item => item.category === currentCategory);
+
+    // Filter by search query (client-side)
+    if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        filteredNews = filteredNews.filter(item => 
+            item.title?.toLowerCase().includes(q) ||
+            item.description?.toLowerCase().includes(q)
+        );
+    }
+
+    const visibleNews = filteredNews.slice(0, visibleCount);
+    const hasMore = visibleCount < filteredNews.length;
+
+    // Infinite scroll with IntersectionObserver
+    const lastItemRef = useCallback(node => {
+        if (loading) return;
+        if (observerRef.current) observerRef.current.disconnect();
+
+        observerRef.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                setVisibleCount(prev => prev + ITEMS_PER_PAGE);
+            }
+        }, { threshold: 0.1 });
+
+        if (node) observerRef.current.observe(node);
+    }, [loading, hasMore]);
 
     // Get today's date for editorial header
     const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -22,7 +63,7 @@ const Home = ({ news, loading, error }) => {
     return (
         <>
             {/* Editorial Header */}
-            <div className="mb-12 border-b-4 border-black dark:border-white pb-4 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+            <div className="mb-8 border-b-4 border-black dark:border-white pb-4 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
                 <div>
                     <h2 className="text-3xl md:text-5xl font-serif font-bold text-black dark:text-white uppercase tracking-tight">Manşetler</h2>
                     <p className="text-gray-600 dark:text-gray-400 font-editorial italic mt-2">Öne çıkan gelişmeler ve derinlemesine analizler.</p>
@@ -31,6 +72,9 @@ const Home = ({ news, loading, error }) => {
                     {today}
                 </div>
             </div>
+
+            {/* Search Bar */}
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
             {/* Loading State */}
             {loading && (
@@ -52,19 +96,44 @@ const Home = ({ news, loading, error }) => {
             {!loading && !error && filteredNews.length === 0 && (
                 <div className="py-20 flex flex-col items-center justify-center text-center">
                     <h3 className="text-2xl font-serif font-bold mb-2 text-black dark:text-white">Haber Bulunamadı</h3>
-                    <p className="text-gray-600 dark:text-gray-400 font-editorial">Bu kategori için yayına hazırlanan bir içerik bulunmuyor.</p>
+                    <p className="text-gray-600 dark:text-gray-400 font-editorial">
+                        {searchQuery ? `"${searchQuery}" ile eşleşen haber bulunamadı.` : 'Bu kategori için yayına hazırlanan bir içerik bulunmuyor.'}
+                    </p>
                 </div>
             )}
 
             {/* News Grid */}
-            {!loading && !error && filteredNews.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-                    {filteredNews.map((item, index) => (
-                        <div key={item.id} className={`${index === 0 ? 'md:col-span-2 lg:col-span-3 border-b-4 border-black dark:border-white pb-8 mb-4' : ''}`}>
-                            <NewsCard item={item} />
+            {!loading && !error && visibleNews.length > 0 && (
+                <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                        {visibleNews.map((item, index) => (
+                            <div 
+                                key={item.id} 
+                                ref={index === visibleNews.length - 1 ? lastItemRef : null}
+                                className={`${index === 0 && !searchQuery ? 'md:col-span-2 lg:col-span-3 border-b-4 border-black dark:border-white pb-8 mb-4' : ''}`}
+                            >
+                                <NewsCard item={item} />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Loading More Indicator */}
+                    {hasMore && (
+                        <div className="py-12 flex flex-col items-center justify-center">
+                            <div className="w-8 h-8 border-2 border-gray-300 border-t-black dark:border-gray-700 dark:border-t-white rounded-full animate-spin"></div>
+                            <p className="mt-3 text-xs font-mono uppercase tracking-widest text-gray-500">Daha fazla yükleniyor...</p>
                         </div>
-                    ))}
-                </div>
+                    )}
+
+                    {/* End of feed */}
+                    {!hasMore && filteredNews.length > ITEMS_PER_PAGE && (
+                        <div className="py-8 text-center border-t-2 border-black dark:border-white mt-8">
+                            <p className="text-xs font-mono uppercase tracking-widest text-gray-500 mt-4">
+                                — Tüm haberler gösterildi ({filteredNews.length} haber) —
+                            </p>
+                        </div>
+                    )}
+                </>
             )}
         </>
     );
