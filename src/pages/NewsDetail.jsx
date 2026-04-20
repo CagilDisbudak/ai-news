@@ -14,29 +14,60 @@ const SMART_THUMBNAILS = {
 };
 
 const extractImage = (item) => {
-    // 1. Try enclosure (usually the best quality hero image)
-    if (item.enclosure && item.enclosure.link && item.enclosure.type && item.enclosure.type.startsWith('image/')) {
-        return item.enclosure.link;
-    }
-    // 2. Try thumbnail if enclosure fails
-    if (item.thumbnail && !item.thumbnail.includes('1x1') && !item.thumbnail.includes('logo')) {
-        return item.thumbnail;
-    }
-    
-    // 3. Fallback to extracting from description/content HTML
-    const imgRegex = /<img[^>]+src="([^">]+)"/ig;
-    let match;
-    const searchArea = (item.description || '') + ' ' + (item.content || '');
-    
-    while ((match = imgRegex.exec(searchArea)) !== null) {
-        const url = match[1].toLowerCase();
-        // Ignore tiny tracking pixels, common logos, and icons
-        if (!url.includes('1x1') && !url.includes('pixel') && !url.includes('logo') && !url.includes('avatar') && !url.includes('icon')) {
-            return match[1]; // Return the original case URL
-        }
+    const isPlaceholder = (url) => {
+        if (!url) return true;
+        const lowUrl = url.toLowerCase();
+        return lowUrl.includes('placeholder') || 
+               lowUrl.includes('default') || 
+               lowUrl.includes('no-image') || 
+               lowUrl.includes('pixel') ||
+               lowUrl.includes('1x1') ||
+               lowUrl.includes('logo-dh') ||
+               lowUrl.includes('avatar') ||
+               lowUrl.includes('donanimhaber.com/images/haber/') === false && lowUrl.includes('donanimhaber.com');
+    };
+
+    const getKeywordImage = (title) => {
+        const t = (title || '').toLowerCase();
+        if (t.includes('ekran kartı') || t.includes('gpu') || t.includes('nvidia') || t.includes('rtx') || t.includes('gtx'))
+            return 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&q=80&w=1200';
+        if (t.includes('işlemci') || t.includes('cpu') || t.includes('intel') || t.includes('amd') || t.includes('ryzen'))
+            return 'https://images.unsplash.com/photo-1555617766-c94804975da3?auto=format&fit=crop&q=80&w=1200';
+        if (t.includes('anakart') || t.includes('motherboard'))
+            return 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1200';
+        if (t.includes('ram') || t.includes('bellek'))
+            return 'https://images.unsplash.com/photo-1541029071515-84cc54f84dc5?auto=format&fit=crop&q=80&w=1200';
+        if (t.includes('telefon') || t.includes('iphone') || t.includes('samsung') || t.includes('xiaomi') || t.includes('mobil')) 
+            return 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=1200';
+        if (t.includes('laptop') || t.includes('bilgisayar') || t.includes('macbook'))
+            return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=1200';
+        if (t.includes('oyun') || t.includes('gaming') || t.includes('ps5') || t.includes('xbox') || t.includes('nintendo') || t.includes('steam')) 
+            return 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=1200';
+        if (t.includes('yapay zeka') || t.includes('ai') || t.includes('chatgpt') || t.includes('yazılım')) 
+            return 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1200';
+        if (t.includes('araba') || t.includes('togg') || t.includes('tesla') || t.includes('elektrikli') || t.includes('otomobil')) 
+            return 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=1200';
+        if (t.includes('uzay') || t.includes('nasa') || t.includes('yıldız') || t.includes('gezegen') || t.includes('roket')) 
+            return 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200';
+        return null;
+    };
+
+    let sourceImg = null;
+    if (item.enclosure && item.enclosure.url) sourceImg = item.enclosure.url;
+    else if (item.thumbnail) sourceImg = item.thumbnail;
+    else {
+        const imgRegex = /<img[^>]+src="([^">]+)"/ig;
+        const match = imgRegex.exec((item.description || '') + ' ' + (item.content || ''));
+        if (match) sourceImg = match[1];
     }
 
-    // 4. Ultimate fallback to smart thumbnails
+    if (sourceImg && !isPlaceholder(sourceImg)) {
+        return sourceImg;
+    }
+
+    const keywordImg = getKeywordImage(item.title);
+    if (keywordImg) return keywordImg;
+
     return SMART_THUMBNAILS[item.category] || SMART_THUMBNAILS['dünya'];
 };
 
