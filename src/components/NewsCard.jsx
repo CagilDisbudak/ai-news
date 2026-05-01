@@ -25,15 +25,18 @@ const extractImage = (item) => {
     const isPlaceholder = (url) => {
         if (!url) return true;
         const lowUrl = url.toLowerCase();
-        // Donanım Haber specific placeholders and generic patterns
+        // Donanım Haber: sadece haber klasöründeki görseller geçerli
+        if (lowUrl.includes('donanimhaber.com')) {
+            return !lowUrl.includes('/haber/');
+        }
+        // Genel placeholder kalıpları
         return lowUrl.includes('placeholder') || 
                lowUrl.includes('default') || 
                lowUrl.includes('no-image') || 
                lowUrl.includes('pixel') ||
                lowUrl.includes('1x1') ||
                lowUrl.includes('logo-dh') ||
-               lowUrl.includes('avatar') ||
-               lowUrl.includes('donanimhaber.com/images/haber/') === false && lowUrl.includes('donanimhaber.com');
+               lowUrl.includes('avatar');
     };
 
     const getKeywordImage = (title) => {
@@ -197,8 +200,13 @@ const NewsCard = ({ item }) => {
                         src={imageUrl} 
                         alt={item.title} 
                         className="w-full h-full object-cover transition-all duration-700" 
-                        loading="lazy" 
-                        onError={(e) => { e.target.src = SMART_THUMBNAILS[item.category] || SMART_THUMBNAILS['dünya']; }}
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                            if (e.target.src !== (SMART_THUMBNAILS[item.category] || SMART_THUMBNAILS['dünya'])) {
+                                e.target.src = SMART_THUMBNAILS[item.category] || SMART_THUMBNAILS['dünya'];
+                            }
+                        }}
                     />
                     <div className="absolute bottom-0 left-0 bg-black text-white dark:bg-white dark:text-black px-3 py-1 text-xs font-bold uppercase tracking-widest">
                         {categoryLabel}
