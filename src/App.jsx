@@ -7,6 +7,7 @@ import NewsDetail from './pages/NewsDetail';
 import Finance from './pages/Finance';
 import Sports from './pages/Sports';
 import ScrollToTop from './components/ScrollToTop';
+import ChatWidget from './components/ChatWidget';
 
 const RSS2JSON_API = 'https://api.rss2json.com/v1/api.json?rss_url=';
 const FEEDS = [
@@ -93,6 +94,8 @@ function App() {
           <Route path="/spor" element={<Sports />} />
         </Routes>
       </main>
+
+      <ChatWidget news={allNews} loading={loading} />
 
       {/* Footer */}
       <footer className="bg-white dark:bg-dark-bg border-t border-gray-300 dark:border-dark-border mt-auto py-12">
